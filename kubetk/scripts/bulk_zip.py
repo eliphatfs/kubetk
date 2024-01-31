@@ -19,7 +19,7 @@ def main():
 
     def dispatch(p):
         isfile = os.path.isfile(p)
-        isdir = os.path.isdir(p)
+        isdir = not isfile and os.path.isdir(p)
         assert isfile or isdir
         if isfile:
             pool.apply_async(archive, [p])
