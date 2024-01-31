@@ -20,7 +20,7 @@ It also recurses into directories with good concurrency.
 
 #### Benchmark
 
-Cross-zone (files stored in us-west and cluster node is us-central node) archiving 5000 small thumbnails that sums up to 559MB:
+Cross-zone (files stored in *us-west* and execution node is in *us-central*) archiving 5000 small thumbnails that sum up to 559MB:
 
 | Binary | Threads | Wall Time (s) |
 | :----: | :-----: | :--: |
