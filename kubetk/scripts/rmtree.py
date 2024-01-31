@@ -17,8 +17,13 @@ def main():
             with iolock:
                 print(p, flush=True)
 
-    def dispatch(p):
-        st = os.stat(p)
+    def dispatch(p, root=False):
+        try:
+            st = os.stat(p)
+        except FileNotFoundError:
+            if not root:
+                raise
+            return
         isfile = stat.S_ISREG(st.st_mode) or stat.S_ISLNK(st.st_mode)
         isdir = stat.S_ISDIR(st.st_mode)
         assert isfile or isdir
@@ -48,7 +53,7 @@ def main():
     while not dispatch_futures.empty():
         dispatch_futures.get().get()
     for sub in args.targets:
-        dispatch_futures.put(pool.apply_async(dispatch, [sub]))
+        dispatch_futures.put(pool.apply_async(dispatch, [sub, True]))
     while not dispatch_futures.empty():
         dispatch_futures.get().get()
     pool.close()
