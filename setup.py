@@ -27,10 +27,10 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    install_requires=[
-        'numpy', 'typing_extensions'
-    ],
     python_requires='~=3.7',
-    include_package_data=True,
-    package_data={'': ['*.obj', '*.npz', '*.glb']},
+    entry_points=dict(
+        console_scripts=[
+            "kubetk-bulk-zip=kubetk.scripts.bulk_zip:main"
+        ]
+    )
 )
