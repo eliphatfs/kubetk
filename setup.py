@@ -30,7 +30,8 @@ setuptools.setup(
     python_requires='~=3.7',
     entry_points=dict(
         console_scripts=[
-            "kubetk-bulk-zip=kubetk.scripts.bulk_zip:main"
+            "kubetk-bulk-zip=kubetk.scripts.bulk_zip:main",
+            "kubetk-rmtree=kubetk.scripts.rmtree:main"
         ]
     )
 )
