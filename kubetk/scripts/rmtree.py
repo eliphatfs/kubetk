@@ -1,5 +1,4 @@
 import os
-import stat
 import argparse
 import textwrap
 from queue import Queue
@@ -17,27 +16,20 @@ def main():
             with iolock:
                 print(p, flush=True)
 
-    def dispatch(p, root=False):
-        try:
-            st = os.stat(p)
-        except FileNotFoundError:
-            if not root:
-                raise
-            return
-        isfile = stat.S_ISREG(st.st_mode) or stat.S_ISLNK(st.st_mode)
-        isdir = stat.S_ISDIR(st.st_mode)
-        assert isfile or isdir
-        if isfile:
-            pool.apply_async(remove, [p])
-        if isdir:
-            ls = os.listdir(p)
-            if not ls:
-                os.rmdir(p)
-                if args.verbose:
-                    with iolock:
-                        print(p, flush=True)
-            for s in ls:
-                dispatch_futures.put(pool.apply_async(dispatch, [os.path.join(p, s)]))
+    def dispatch(p):
+        isempty = True
+        for entry in os.scandir(p):
+            isempty = False
+            if entry.is_symlink() or entry.is_file(follow_symlinks=False):
+                pool.apply_async(remove, [entry.path])
+            elif entry.is_dir():
+                dispatch_futures.put(pool.apply_async(dispatch, [entry.path]))
+            else:
+                raise TypeError("Unexpected FS entry type", entry.path)
+        if isempty:
+            os.removedirs(p)
+            with iolock:
+                print(p, flush=True)
 
     argp = argparse.ArgumentParser(description=textwrap.dedent("""
         Rapidly removes the directory and all its contents.
