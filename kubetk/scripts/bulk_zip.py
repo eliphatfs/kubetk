@@ -1,4 +1,5 @@
 import os
+import stat
 import zipfile
 import argparse
 import textwrap
@@ -18,8 +19,9 @@ def main():
                 zipf.writestr(os.path.relpath(p).replace(os.path.pathsep, '/'), contents)
 
     def dispatch(p):
-        isfile = os.path.isfile(p)
-        isdir = not isfile and os.path.isdir(p)
+        st = os.stat(p)
+        isfile = stat.S_ISREG(st.st_mode)
+        isdir = stat.S_ISDIR(st.st_mode)
         assert isfile or isdir
         if isfile:
             pool.apply_async(archive, [p])

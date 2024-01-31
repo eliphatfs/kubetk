@@ -1,4 +1,5 @@
 import os
+import stat
 import argparse
 import textwrap
 from queue import Queue
@@ -17,8 +18,9 @@ def main():
                 print(p, flush=True)
 
     def dispatch(p):
-        isfile = os.path.isfile(p) or os.path.islink(p)
-        isdir = not isfile and os.path.isdir(p)
+        st = os.stat(p)
+        isfile = stat.S_ISREG(st.st_mode) or stat.S_ISLNK(st.st_mode)
+        isdir = stat.S_ISDIR(st.st_mode)
         assert isfile or isdir
         if isfile:
             pool.apply_async(remove, [p])
