@@ -27,3 +27,17 @@ Cross-zone (files stored in *us-west* and execution node is in *us-central*) arc
 | `zip` | - | 1216 |
 | `kubetk-bulk-zip` | `32` (default) | 32.0 |
 | `kubetk-bulk-zip` | `256` | 13.9 |
+
+### `kubetk-rmtree`
+
+The script recurses into directories and removes all the contents concurrently.
+
+#### Benchmark
+
+Cross-zone (files stored in *us-east* and execution node is in *us-central*):
+
+| Binary | Threads | Throughput (files/s) |
+| :----: | :-----: | :--: |
+| `rm` | - | 14.01 |
+| `kubetk-rmtree` | `32` (default) | 15.52 |
+| `kubetk-rmtree` | `1024` | 15.93 |
