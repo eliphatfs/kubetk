@@ -25,8 +25,8 @@ Cross-zone (files stored in *us-west* and execution node is in *us-central*) arc
 | Binary | Threads | Wall Time (s) |
 | :----: | :-----: | :--: |
 | `zip` | - | 1216 |
-| `kubetk-bulk-zip` | `32` (default) | 32.0 |
-| `kubetk-bulk-zip` | `256` | 13.9 |
+| `kubetk-bulk-zip` | `32` (default) | 16.3 |
+| `kubetk-bulk-zip` | `256` | 3.0 |
 
 ### `kubetk-rmtree`
 
