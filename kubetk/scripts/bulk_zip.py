@@ -3,31 +3,18 @@ import stat
 import zipfile
 import argparse
 import textwrap
-from queue import Queue
 from threading import Lock
-from multiprocessing.pool import ThreadPool
+from kubetk.helpers.parallel_walk import parallel_walk
 
 
 def main():
     ziplock = Lock()
-    dispatch_futures = Queue()
 
     def archive(p):
         with open(p, "rb") as fi:
             contents = fi.read()
             with ziplock:
                 zipf.writestr(os.path.relpath(p).replace(os.path.pathsep, '/'), contents)
-
-    def dispatch(p):
-        st = os.stat(p)
-        isfile = stat.S_ISREG(st.st_mode)
-        isdir = stat.S_ISDIR(st.st_mode)
-        assert isfile or isdir
-        if isfile:
-            pool.apply_async(archive, [p])
-        if isdir:
-            for s in os.listdir(p):
-                dispatch_futures.put(pool.apply_async(dispatch, [os.path.join(p, s)]))
 
     argp = argparse.ArgumentParser(description=textwrap.dedent("""
         Archive (store) the inputs into output zip file.
@@ -40,14 +27,8 @@ def main():
     argp.add_argument("-v", "--verbose", action='store_true')
     argp.add_argument("--read-threads", type=int, default=32)
     args = argp.parse_args()
-    pool = ThreadPool(args.read_threads)
     with zipfile.ZipFile(args.output, "w") as zipf:
-        for sub in args.inputs:
-            dispatch_futures.put(pool.apply_async(dispatch, [sub]))
-        while not dispatch_futures.empty():
-            dispatch_futures.get().get()
-        pool.close()
-        pool.join()
+        parallel_walk(args.inputs, archive, num_threads=args.read_threads)
         if args.verbose:
             for name in zipf.namelist():
                 print(name)
