@@ -55,4 +55,4 @@ Cross-zone (files stored in *us-west* and execution node is in *us-central*) cop
 | :----: | :-----: | :--: |
 | `cp` | - | 423.7 |
 | `kubetk-cp` | `32` (default) | 22.7 |
-| `kubetk-rmtree` | `256` | 4.3 |
+| `kubetk-cp` | `256` | 4.3 |
