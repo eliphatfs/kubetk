@@ -1,14 +1,15 @@
 import os
 import argparse
 import textwrap
-from queue import Queue
 from threading import Lock
-from multiprocessing.pool import ThreadPool
+from kubetk.helpers.parallel_walk import parallel_walk
 
 
 def main():
     iolock = Lock()
-    dispatch_futures = Queue()
+
+    def nil(_):
+        pass
 
     def remove(p):
         os.unlink(p)
@@ -16,20 +17,12 @@ def main():
             with iolock:
                 print(p, flush=True)
 
-    def dispatch(p):
-        isempty = True
-        for entry in os.scandir(p):
-            isempty = False
-            if entry.is_symlink() or entry.is_file(follow_symlinks=False):
-                pool.apply_async(remove, [entry.path])
-            elif entry.is_dir():
-                dispatch_futures.put(pool.apply_async(dispatch, [entry.path]))
-            else:
-                raise TypeError("Unexpected FS entry type", entry.path)
-        if isempty:
+    def rmdirs(p, entries):
+        if not len(entries):
             os.removedirs(p)
-            with iolock:
-                print(p, flush=True)
+            if args.verbose:
+                with iolock:
+                    print(p, flush=True)
 
     argp = argparse.ArgumentParser(description=textwrap.dedent("""
         Rapidly removes the directory and all its contents.
@@ -38,18 +31,9 @@ def main():
     argp.add_argument("-v", "--verbose", action='store_true')
     argp.add_argument("--threads", type=int, default=32)
     args = argp.parse_args()
-    pool = ThreadPool(args.threads)
 
-    for sub in args.targets:
-        dispatch_futures.put(pool.apply_async(dispatch, [sub]))
-    while not dispatch_futures.empty():
-        dispatch_futures.get().get()
-    for sub in args.targets:
-        dispatch_futures.put(pool.apply_async(dispatch, [sub, True]))
-    while not dispatch_futures.empty():
-        dispatch_futures.get().get()
-    pool.close()
-    pool.join()
+    parallel_walk(args.targets, remove, None, args.threads)
+    parallel_walk(args.targets, nil, rmdirs, args.threads)
 
 
 if __name__ == '__main__':
