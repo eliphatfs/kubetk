@@ -41,3 +41,18 @@ Cross-zone (files stored in *us-east* and execution node is in *us-central*):
 | `rm` | - | 14.01 |
 | `kubetk-rmtree` | `32` (default) | 15.52 |
 | `kubetk-rmtree` | `1024` | 15.93 |
+
+
+### `kubetk-cp`
+
+`kubetk-cp src dst` is a concurrent version of `cp -r src dst`.
+
+#### Benchmark
+
+Cross-zone (files stored in *us-west* and execution node is in *us-central*) copying 5000 small thumbnails that sum up to 559MB (destination is local SSD):
+
+| Binary | Threads | Wall Time (s) |
+| :----: | :-----: | :--: |
+| `cp` | - | 423.7 |
+| `kubetk-cp` | `32` (default) | 22.7 |
+| `kubetk-rmtree` | `256` | 4.3 |
