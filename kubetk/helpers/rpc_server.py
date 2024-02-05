@@ -7,4 +7,4 @@ class RPCThreading(ThreadingMixIn, DocXMLRPCServer):
 
 
 def threaded(port):
-    return RPCThreading(('0.0.0.0', port), DocXMLRPCRequestHandler)
+    return RPCThreading(('0.0.0.0', port), DocXMLRPCRequestHandler, allow_none=True)
