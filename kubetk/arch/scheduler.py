@@ -93,8 +93,30 @@ class Statistics(object):
             return list(self.work_queue.messages)
 
 
+class Storage(object):
+
+    def __init__(self) -> None:
+        self.data = dict()
+        self.write_lock = threading.Lock()
+
+    def kv_cas(self, k, v, c):
+        with self.write_lock:
+            old = self.data.get(k)
+            if old == c:
+                self.data[k] = v
+            return old
+
+    def kv_store(self, k, v):
+        with self.write_lock:
+            self.data[k] = v
+
+    def kv_load(self, k):
+        return self.data.get(k)
+
+
 def serve_scheduler(work_queue: WorkQueue, stats_period: float = 30.0, port: int = 9105):
     stats = Statistics(work_queue, stats_period)
+    storage = Storage()
     with rpc_server.threaded(port) as server:
         server.register_introspection_functions()
         server.register_multicall_functions()
@@ -105,4 +127,7 @@ def serve_scheduler(work_queue: WorkQueue, stats_period: float = 30.0, port: int
         server.register_function(stats.stat)
         server.register_function(stats.list_errors)
         server.register_function(stats.list_messages)
+        server.register_function(storage.kv_cas)
+        server.register_function(storage.kv_load)
+        server.register_function(storage.kv_store)
         server.serve_forever(0.5)
