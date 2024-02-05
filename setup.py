@@ -9,7 +9,7 @@ with open("kubetk/version.py", "r") as fh:
 
 
 def packages():
-    return setuptools.find_packages(exclude=['tests'])
+    return setuptools.find_packages(include=['kubet*'])
 
 
 setuptools.setup(
