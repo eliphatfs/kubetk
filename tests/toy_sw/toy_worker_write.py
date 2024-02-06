@@ -1,6 +1,5 @@
 import os
 import kubetk.arch.worker as wk
-from xmlrpc.client import ServerProxy
 
 
 def compute(x):
