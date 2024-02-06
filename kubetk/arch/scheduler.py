@@ -68,10 +68,15 @@ class Statistics(object):
         threading.Thread(target=self._update_stats, daemon=True).start()
 
     def _update_stats(self):
+        rec = []
+        n_interval = int(self.period / 2) if self.period > 2 else 1
         while True:
             start = self.work_queue.queue.qsize()
-            time.sleep(self.period)
-            self.speed = self.work_queue.queue.qsize() - start
+            time.sleep(self.period / n_interval)
+            rec.append(start - self.work_queue.queue.qsize())
+            self.speed = sum(rec) / len(rec) * n_interval
+            if len(rec) >= n_interval:
+                rec.pop(0)
 
     def stat(self):
         return dict(

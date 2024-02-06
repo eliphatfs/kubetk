@@ -33,6 +33,8 @@ setuptools.setup(
             "kubetk-bulk-zip=kubetk.scripts.bulk_zip:main",
             "kubetk-rmtree=kubetk.scripts.rmtree:main",
             "kubetk-cp=kubetk.scripts.cp:main",
+            "kubetk-statsched=kubetk.scripts.statsched:main",
+            "statsched=kubetk.scripts.statsched:main",
         ]
     )
 )
