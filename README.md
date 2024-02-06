@@ -10,6 +10,7 @@ pip install git+https://github.com/eliphatfs/kubetk.git
 ## Single-Node CLI Scripts
 
 These scripts use concurrency to boost the throughput of high-latency volumes.
+Use `-h` option to see usage.
 
 ### `kubetk-bulk-zip`
 
@@ -56,3 +57,21 @@ Cross-zone (files stored in *us-west* and execution node is in *us-central*) cop
 | `cp` | - | 423.7 |
 | `kubetk-cp` | `32` (default) | 22.7 |
 | `kubetk-cp` | `256` | 4.3 |
+
+## Distributed Scheduler-Worker Architecture
+
+### Scheduler
+
+The implementation is in `kubetk.arch.scheduler`.
+
+#### Monitoring
+
+See `statsched -h`.
+
+### Worker
+
+The implementation is in `kubetk.arch.worker`.
+
+#### Pipelining
+
+We provide pipelining functionality in worker for better compute to IO utility ratio.
