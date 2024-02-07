@@ -54,8 +54,8 @@ def main():
     assert int(args.pod is not None) + int(args.ip is not None) == 1
     if args.ip is None:
         proc = subprocess.Popen(
-            f"kubectl port-forward {args.pod} {args.port}:{args.port}",
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True
+            ["kubectl", "port-forward", f"{args.pod}", f"{args.port}:{args.port}"],
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
         args.ip = '127.0.0.1'
         print(proc.stdout.readline().decode(), end='')
